@@ -10,6 +10,7 @@
         <h1>selamat datang</h1>
         <h1>Di Halo Petani</h1>
         <h5>kelompok 4</h5>
+        <h4>Gaskeun slur</h4>
     </header>
     <h4>Menu</h4>
     <nav>
