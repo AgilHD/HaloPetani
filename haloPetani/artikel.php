@@ -82,6 +82,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #45a049;
             transform: scale(1.05);
         }
+        select {
+            width: 100%; /* Atur lebar menjadi penuh */
+            max-width: 800px; /* Batas maksimum lebar */
+            height: auto; /* Tinggi disesuaikan dengan isi */
+        }
     </style>
 </head>
 <body>
@@ -92,7 +97,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <label for="fullname">Nama Lengkap:</label><br>
         <input type="text" id="fullname" name="fullname" required><br>
         <label for="articleType">Jenis Artikel:</label><br>
-        <input type="text" id="articleType" name="articleType" required><br>
+        <select id="articleType" name="articleType" required>
+            <option value="tanaman buah">Tanaman Buah</option>
+            <option value="tanaman hias">Tanaman Hias</option>
+            <option value="pupuk tanaman">Pupuk Tanaman</option>
+        </select><br>
         <label for="articleText">Isi Artikel:</label><br>
         <textarea id="articleText" name="articleText" required></textarea><br>
         <input type="submit" value="Unggah Artikel">
