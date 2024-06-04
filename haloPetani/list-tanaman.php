@@ -65,15 +65,6 @@
 </head>
 <body>
     <h2>Form Jenis Tanaman</h2>
-    <form action="proses-daftar.php" method="POST">
-        <label for="plantTypeID">PlantTypeID:</label>
-        <input type="text" id="plantTypeID" name="plantTypeID">
-        <label for="plantTypeName">PlantTypeName:</label>
-        <input type="text" id="plantTypeName" name="plantTypeName">
-        <input type="submit" value="Submit">
-    </form>
-
-    <h2>Search Plant</h2>
     <form onsubmit="return searchPlant()">
         <label for="searchQuery">Search by PlantTypeName:</label>
         <input type="text" id="searchQuery" name="searchQuery">
