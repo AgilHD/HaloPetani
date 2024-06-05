@@ -1,6 +1,14 @@
 <?php
 session_start(); // Memindahkan session_start() ke baris pertama setelah tag pembuka PHP
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Your form processing code here
+
+    // Redirect the user to the same page using HTTP GET after form submission
+    header("Location: ".$_SERVER['REQUEST_URI']);
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
