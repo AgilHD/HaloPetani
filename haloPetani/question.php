@@ -229,7 +229,7 @@ $(document).ready(function() {
                 var likeCount = button.find('.likeCount');
                 var currentLikes = parseInt(likeCount.text().replace(/,/g, ''));
                 likeCount.text((currentLikes + 1).toLocaleString());
-                var heart = $('<span class="heart-bounce">❤️</span>');
+                var heart = $('<span class="heart-bounce">❤</span>');
                 button.append(heart);
                 setTimeout(function() { heart.remove(); }, 1000);
             } else {
@@ -260,15 +260,14 @@ $(document).ready(function() {
             <label for="pertanyaan">Pertanyaan:</label>
             <textarea id="pertanyaan" name="pertanyaan" rows="4" required></textarea>
 
-        
-
             <input type="submit" value="Kirim Pertanyaan" name="submit_pertanyaan">
         </form>
 
         <hr>
 
         <!-- Daftar pertanyaan -->
-        <h2>Pertanyaan-pertanyaan:</h2>
+        <h2>Pertanyaan-pertanyaan:</h2> 
+        
         <?php
         include 'config.php'; // Sertakan file koneksi ke database
 
@@ -276,15 +275,14 @@ $(document).ready(function() {
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pertanyaan'])) {
             $fullname = $_POST['fullname'];
             $pertanyaan = $_POST['pertanyaan'];
-           
 
             // Simpan pertanyaan ke dalam database
-            $query = "INSERT INTO pertanyaan (fullname, pertanyaan, ) VALUES (?, ?)";
+            $query = "INSERT INTO pertanyaan (fullname, pertanyaan) VALUES (?, ?)";
             $stmt = $koneksi->prepare($query);
             if ($stmt === false) {
                 die("Error preparing statement: " . $koneksi->error);
             }
-            $stmt->bind_param("sss", $fullname, $pertanyaan);
+            $stmt->bind_param("ss", $fullname, $pertanyaan);
             if ($stmt->execute()) {
                 echo "<p>Pertanyaan Anda telah berhasil dikirim.</p>";
             } else {
@@ -326,12 +324,11 @@ $(document).ready(function() {
                 // Tampilkan pertanyaan dalam daftar
                 while ($row = $result->fetch_assoc()) {
                     echo "<div class='pertanyaan'>";
-                    echo "<p><strong>" . $row['fullname'] . ":</strong> " . $row['pertanyaan'] . "</p>";
-                  
+                    echo "<p><strong>" . htmlspecialchars($row['fullname']) . ":</strong> " . htmlspecialchars($row['pertanyaan']) . "</p>";
 
                     // Formulir untuk mengajukan jawaban
                     echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='POST'>";
-                    echo "<input type='hidden' name='idpertanyaan' value='" . $row['idpertanyaan'] . "'>";
+                    echo "<input type='hidden' name='idpertanyaan' value='" . htmlspecialchars($row['idpertanyaan']) . "'>";
                     echo "<textarea name='jawaban' rows='2' required></textarea>";
                     echo "<input type='submit' value='Kirim Jawaban' name='submit_jawaban'>";
                     echo "</form>";
@@ -347,15 +344,17 @@ $(document).ready(function() {
                             // Tampilkan jawaban dalam daftar
                             while ($row2 = $result2->fetch_assoc()) {
                                 echo "<div class='jawaban'>";
-                                echo "<p><strong>" . $row2['fullname'] . ":</strong> " . $row2['jawaban'] . "</p>";
-                                // Tambahkan tombol like
-                                echo "<button class='Btn' data-idjawaban='" . $row2['idjawaban'] . "'>";
+                                echo "<p><strong>" . htmlspecialchars($row2['fullname']) . ":</strong> " . htmlspecialchars($row2['jawaban']) . "</p>";
+
+                                // Tombol Like
+                                echo "<button class='Btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
                                 echo "  <span class='leftContainer'>";
                                 echo "    <svg fill='white' viewBox='0 0 512 512' height='1em' xmlns='http://www.w3.org/2000/svg'><path d='M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z'></path></svg>";
                                 echo "    <span class='like'>Like</span>";
                                 echo "  </span>";
-                                echo "  <span class='likeCount'>" . $row2['likes'] . "</span>";
+                                echo "  <span class='likeCount'>" . htmlspecialchars($row2['likes']) . "</span>";
                                 echo "</button>";
+
                                 echo "</div>";
                             }
                         }
@@ -377,5 +376,4 @@ $(document).ready(function() {
         ?>
     </div>
 </body>
-</html>
-
+</html>v
