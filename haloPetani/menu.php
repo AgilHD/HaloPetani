@@ -68,6 +68,7 @@ include 'config.php';
             background-color: rgba(255, 255, 255, 0.9);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             animation: fadeIn 2s ease-in-out;
+            margin: 20px;
         }
 
         @keyframes fadeIn {
@@ -101,6 +102,22 @@ include 'config.php';
             echo "</ol>";
         } else {
             echo "Belum ada pengguna.";
+        }
+        ?>
+    </div>
+    <div class="menu-section">
+        <h2>Top Articles</h2>
+        <?php
+        $query = "SELECT title, countArticle FROM artikel ORDER BY countArticle DESC LIMIT 10";
+        $result = $koneksi->query($query);
+        if ($result->num_rows > 0) {
+            echo "<ol>";
+            while ($row = $result->fetch_assoc()) {
+                echo "<li>" . $row['title'] . " - " . $row['countArticle'] . " pts</li>";
+            }
+            echo "</ol>";
+        } else {
+            echo "Belum ada artikel.";
         }
         ?>
     </div>
