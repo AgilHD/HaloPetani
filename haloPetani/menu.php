@@ -83,13 +83,9 @@ include 'config.php';
     </header>
     <nav>
         <ul>
-            <li><a href="login-pengguna.php">Pengguna (User)</a></li>
-            <li><a href="list-tanaman.php">Data jenis tanaman</a></li>
-            <li><a href="question.php">Pertanyaan (Question)</a></li>
-            <li><a href="point-kualitas.php">QualityPoint</a></li>
-            <li><a href="bacaartikel.php">membaca artikel</a></li>
-            <li><a href="artikel.php">Artikel (Article)</a></li>
-            <li><a href="transaksi-artikel.php">TransaksiArtikel (ArticleTransaction)</a></li>
+            <li><a href="question.php">Q&A</a></li>
+            <li><a href="bacaartikel.php">Artikel Pertanaman</a></li>
+            <li><a href="login-pengguna.php">LogOut</a></li>
         </ul>
     </nav>
     <div class="menu-section">
