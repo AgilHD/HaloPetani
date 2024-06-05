@@ -105,7 +105,7 @@ $foto_profil = "foto_profil.jpg";
             <ul>
                 <li><a href="artikel.php">Manajemen Artikel</a></li>
                 <li><a href="manajemenqna.php">Manajemen Pertanyaan dan Jawaban</a></li>
-                <li><a href="login-pengguna">LogOut</a></li>
+                <li><a href="login-pengguna.php">LogOut</a></li>
             </ul>
         </nav>
         <div class="content">
