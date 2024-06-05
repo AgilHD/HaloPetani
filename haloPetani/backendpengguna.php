@@ -3,8 +3,6 @@ session_start();
 
 include 'config.php'; // Include your database connection file
 
-
-
 if (isset($_POST['login'])) {
     $fullname = $_POST['fullname'];
     $password = md5($_POST['password']); // Encrypt password using md5
@@ -23,8 +21,15 @@ if (isset($_POST['login'])) {
         // User found
         $data = $result->fetch_assoc();
         $_SESSION['user'] = $data;
-        header("Location: menu.php");
-        exit();
+        
+        // Check if the user is an admin
+        if ($data['fullname'] == 'admin' && $data['password'] == md5('admin1234')) {
+            header("Location: adminpage.php");
+            exit();
+        } else {
+            header("Location: menu.php"); // Redirect to regular menu if not admin
+            exit();
+        }
     } else {
         // User not found
         $error = "Fullname atau password tidak sesuai.";
