@@ -1,7 +1,6 @@
 <?php
-// Simulasi pengambilan data pengguna dari database HaloPetani
-$nama_pengguna = "John Doe"; // Ganti dengan nama pengguna dari database
-$foto_profil = "foto_profil.jpg"; // Ganti dengan nama foto profil dari database
+$nama_pengguna = "Admin"; 
+$foto_profil = "foto_profil.jpg";
 ?>
 
 <!DOCTYPE html>
@@ -12,21 +11,28 @@ $foto_profil = "foto_profil.jpg"; // Ganti dengan nama foto profil dari database
     <title>Admin Dashboard - HaloPetani</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url('petani1.jpg'); 
+            background-size: cover;
+            animation: backgroundAnimation 20s infinite alternate;
         }
         .container {
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
+        @keyframes backgroundAnimation {
+            0% { filter: brightness(1); }
+            100% { filter: brightness(0.8); }
+        }
+
         header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s ease-in-out;
         }
         .profile-section {
             display: flex;
@@ -38,23 +44,51 @@ $foto_profil = "foto_profil.jpg"; // Ganti dengan nama foto profil dari database
             border-radius: 50%;
             margin-right: 10px;
         }
-        nav {
-            background-color: #f4f4f4;
-            padding: 10px 20px;
-        }
         nav ul {
             list-style-type: none;
-            margin: 0;
             padding: 0;
-            display: flex;
+            margin: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: hidden;
+            text-align: center;
+            animation: slideIn 1s ease-in-out;
         }
+
+        @keyframes slideIn {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
         nav ul li {
-            margin-right: 20px;
+            display: inline-block;
         }
+
         nav ul li a {
+            display: block;
+            color: #ffcc00;
+            text-align: center;
+            padding: 14px 16px;
             text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.3);
             color: #333;
-            font-weight: bold;
+        }
+
+        .menu-section {
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 2s ease-in-out;
+            margin: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -74,9 +108,7 @@ $foto_profil = "foto_profil.jpg"; // Ganti dengan nama foto profil dari database
                 <li><a href="list-tanaman.php">Manajemen Pertanyaan dan Jawaban</a></li>
             </ul>
         </nav>
-        <!-- Content Area -->
         <div class="content">
-            <!-- Content Goes Here -->
         </div>
     </div>
 </body>
