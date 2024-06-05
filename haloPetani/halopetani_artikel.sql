@@ -30,6 +30,7 @@ CREATE TABLE `artikel` (
   `text` text NOT NULL,
   `fullname` varchar(255) NOT NULL,
   `articleType` varchar(255) NOT NULL,
+  `countArticle` int(11) DEFAULT 0
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -40,7 +41,9 @@ CREATE TABLE `artikel` (
 
 LOCK TABLES `artikel` WRITE;
 /*!40000 ALTER TABLE `artikel` DISABLE KEYS */;
-INSERT INTO `artikel` VALUES (1,'pisang','taukah kamu pisang itu disukai oleh monyet','gatau','abstrak'),(2,'rambutan','taukah kamu rambutan ga boleh dimakan oleh harimau','ada','ga tau'),(3,'rambutan','taukah kamu rambutan ga boleh dimakan oleh harimau','ada','ga tau'),(4,'rambutan','taukah kamu rambutan ga boleh dimakan oleh harimau','ada','ga tau'),(5,'a','a','akusiapa','a');
+INSERT INTO `artikel` VALUES 
+(6, 'Kereta Kencana', 'jcnweijfkdscneidsjkcnedsjkxmcndisjxmcxnesdijkmxcnxseidjkmxcnnijdskmx', 'Teknologi', 0),
+(7, 'Kereta Kencana', 'sjndwdnwdnws', 'Teknologi', 0);
 /*!40000 ALTER TABLE `artikel` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
