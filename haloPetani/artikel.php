@@ -3,21 +3,21 @@ include 'config.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $title = $_POST['articleTitle'];
-    $fullname = $_POST['fullname'];
     $text = $_POST['articleText'];
     $articleType = $_POST['articleType'];
 
-    $query = "INSERT INTO artikel (title, text, fullname, articleType) VALUES (?, ?, ?, ?)";
+    $query = "INSERT INTO artikel (title, text, articleType) VALUES (?, ?, ?)";
     $stmt = $koneksi->prepare($query);
     if ($stmt === false) {
         die("Error preparing statement: " . $koneksi->error);
     }
-    $stmt->bind_param("ssss", $title, $text, $fullname, $articleType);
+    $stmt->bind_param("sss", $title, $text, $articleType);
     $stmt->execute();
     $stmt->close();
     $koneksi->close();
 }
 ?>
+
 
 
 <!DOCTYPE html>
@@ -94,16 +94,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form action="artikel.php" method="POST" class="form-container">
         <label for="articleTitle">Judul Artikel:</label><br>
         <input type="text" id="articleTitle" name="articleTitle" required><br>
-        <label for="fullname">Nama Lengkap:</label><br>
-        <input type="text" id="fullname" name="fullname" required><br>
         <label for="articleType">Jenis Artikel:</label><br>
         <select id="articleType" name="articleType" required>
-            <option value="tanaman buah">Tanaman Buah</option>
-            <option value="tanaman hias">Tanaman Hias</option>
-            <option value="pupuk tanaman">Pupuk Tanaman</option>
+            <?php
+            // Koneksi ke database
+            include 'config.php';
+
+            // Kueri untuk mengambil daftar jenis artikel
+            $query = "SELECT nama_jenisartikel FROM jenisartikel";
+            $result = $koneksi->query($query);
+
+            // Periksa apakah kueri berhasil
+            if ($result && $result->num_rows > 0) {
+                // Tampilkan pilihan jenis artikel
+                while ($row = $result->fetch_assoc()) {
+                    echo "<option value='" . $row['nama_jenisartikel'] . "'>" . $row['nama_jenisartikel'] . "</option>";
+                }
+            } else {
+                echo "<option value=''>Tidak ada jenis artikel tersedia</option>";
+            }
+
+            // Tutup koneksi database
+            $koneksi->close();
+            ?>
         </select><br>
+        
         <label for="articleText">Isi Artikel:</label><br>
         <textarea id="articleText" name="articleText" required></textarea><br>
+        <!-- Input for Fullname -->
+
+        
+        <!-- Submit button -->
         <input type="submit" value="Unggah Artikel">
     </form>
 </body>
