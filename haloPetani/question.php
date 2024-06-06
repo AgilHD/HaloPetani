@@ -4,8 +4,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Your form processing code here
 
     // Redirect the user to the same page using HTTP GET after form submission
-    header("Location: ".$_SERVER['REQUEST_URI']);
-    exit();
+    header("Location: " . $_SERVER['REQUEST_URI']);
+    exit();
+}
+
+// Memproses laporan pertanyaan
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_pertanyaan'])) {
+    $idpertanyaan = $_POST['idpertanyaan'];
+
+    // Update jumlah laporan dalam tabel pertanyaan
+    $query = "UPDATE halopetani_pertanyaan SET pertanyaandilaporkan = pertanyaandilaporkan + 1 WHERE idpertanyaan = ?";
+    $stmt = $koneksi->prepare($query);
+    if ($stmt === false) {
+        die("Error preparing statement: " . $koneksi->error);
+    }
+    $stmt->bind_param("i", $idpertanyaan);
+    if ($stmt->execute()) {
+        echo "Laporan pertanyaan telah berhasil ditambahkan.";
+    } else {
+        echo "Terjadi kesalahan saat menambahkan laporan pertanyaan: " . $koneksi->error;
+    }
+    $stmt->close();
+}
+
+// Memproses laporan jawaban
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
+    $idjawaban = $_POST['idjawaban'];
+
+    // Update jumlah laporan dalam tabel jawaban
+    $query = "UPDATE halopetani_jawaban SET jawabandilaporkan = jawabandilaporkan + 1 WHERE idjawaban = ?";
+    $stmt = $koneksi->prepare($query);
+    if ($stmt === false) {
+        die("Error preparing statement: " . $koneksi->error);
+    }
+    $stmt->bind_param("i", $idjawaban);
+    if ($stmt->execute()) {
+        echo "Laporan jawaban telah berhasil ditambahkan.";
+    } else {
+        echo "Terjadi kesalahan saat menambahkan laporan jawaban: " . $koneksi->error;
+    }
+    $stmt->close();
 }
 ?>
 
@@ -225,10 +263,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         transform-origin: top;
     }
 </style>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-$(document).ready(function() {
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+    $(document).ready(function() {
+    // Fungsi untuk tombol Like
     $('.Btn').on('click', function() {
         var button = $(this);
         var idjawaban = button.data('idjawaban');
@@ -247,9 +285,30 @@ $(document).ready(function() {
             alert("Error: tidak dapat mengirim like");
         });
     });
-});
-</script>
 
+    // Fungsi untuk tombol Report
+    $('.report-btn').on('click', function() {
+        var button = $(this);
+        var idpertanyaan = button.data('idpertanyaan');
+        var idjawaban = button.data('idjawaban');
+        
+        if (idpertanyaan) {
+            $.post('lapor_pertanyaan.php', {lapor_pertanyaan: true, idpertanyaan: idpertanyaan}, function(data) {
+                alert(data);
+            }).fail(function() {
+                alert("Error: tidak dapat mengirim laporan pertanyaan");
+            });
+        } else if (idjawaban) {
+            $.post('lapor_jawaban.php', {lapor_jawaban: true, idjawaban: idjawaban}, function(data) {
+                alert(data);
+            }).fail(function() {
+                alert("Error: tidak dapat mengirim laporan jawaban");
+            });
+        }
+    });
+});
+
+    </script>
 </head>
 <body>
     <div class="container">
@@ -321,45 +380,44 @@ $(document).ready(function() {
         }
 
         // Ambil dan tampilkan pertanyaan dari database
-$search = isset($_GET['search']) ? "%" . $_GET['search'] . "%" : "%%";
-$query = "SELECT * FROM pertanyaan WHERE pertanyaan LIKE ? ORDER BY idpertanyaan DESC";
-$stmt = $koneksi->prepare($query);
-$stmt->bind_param("s", $search);
-$stmt->execute();
-$result = $stmt->get_result();
-if ($result) {
-    if ($result->num_rows > 0) {
-        // Tampilkan pertanyaan dalam daftar
-        while ($row = $result->fetch_assoc()) {
-            echo "<div class='pertanyaan'>";
-            echo "<p><strong>" . htmlspecialchars($row['fullname']) . ":</strong> " . htmlspecialchars($row['pertanyaan']) . "</p>";
+        $search = isset($_GET['search']) ? "%" . $_GET['search'] . "%" : "%%";
+        $query = "SELECT * FROM pertanyaan WHERE pertanyaan LIKE ? ORDER BY idpertanyaan DESC";
+        $stmt = $koneksi->prepare($query);
+        $stmt->bind_param("s", $search);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result) {
+            if ($result->num_rows > 0) {
+                // Tampilkan pertanyaan dalam daftar
+                while ($row = $result->fetch_assoc()) {
+                    echo "<div class='pertanyaan'>";
+                    echo "<p><strong>" . htmlspecialchars($row['fullname']) . ":</strong> " . htmlspecialchars($row['pertanyaan']) . "</p>";
+    
+                    // Tombol Lapor
+                    echo "<button class='report-btn' data-idpertanyaan='" . htmlspecialchars($row['idpertanyaan']) . "'>";
+                    echo "<span>Lapor</span>";
+                    echo "</button>";
 
-            // Formulir untuk mengajukan jawaban
+                    // Formulir untuk mengajukan jawaban
             echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='POST'>";
             echo "<input type='hidden' name='idpertanyaan' value='" . htmlspecialchars($row['idpertanyaan']) . "'>";
             echo "<textarea name='jawaban' rows='2' required></textarea>";
             echo "<input type='submit' value='Kirim Jawaban' name='submit_jawaban'>";
             echo "</form>";
 
-            // Tombol Lapor
-            echo "<button class='report-btn' data-idpertanyaan='" . htmlspecialchars($row['idpertanyaan']) . "'>";
-            echo "  <span>Lapor</span>";
-            echo "</button>";
-
-            // Ambil dan tampilkan jawaban dari database
-            $query2 = "SELECT j.idjawaban, j.jawaban, p.fullname, j.likes FROM jawaban j JOIN pengguna p ON j.user_id = p.userid WHERE j.idpertanyaan = ? ORDER BY j.idjawaban DESC";
-            $stmt2 = $koneksi->prepare($query2);
-            $stmt2->bind_param("i", $row['idpertanyaan']);
-            $stmt2->execute();
-            $result2 = $stmt2->get_result();
-            if ($result2) {
-                if ($result2->num_rows > 0) {
-                    // Tampilkan jawaban dalam daftar
-                    while ($row2 = $result2->fetch_assoc()) {
-                        echo "<div class='jawaban'>";
-                        echo "<p><strong>" . htmlspecialchars($row2['fullname']) . ":</strong> " . htmlspecialchars($row2['jawaban']) . "</p>";
-
-                        // Tombol Like
+                    // Ambil dan tampilkan jawaban dari database
+                    $query2 = "SELECT j.idjawaban, j.jawaban, p.fullname, j.likes FROM jawaban j JOIN pengguna p ON j.user_id = p.userid WHERE j.idpertanyaan = ? ORDER BY j.idjawaban DESC";
+                    $stmt2 = $koneksi->prepare($query2);
+                    $stmt2->bind_param("i", $row['idpertanyaan']);
+                    $stmt2->execute();
+                    $result2 = $stmt2->get_result();
+                    if ($result2) {
+                        if ($result2->num_rows > 0) {
+                            while ($row2 = $result2->fetch_assoc()) {
+                                echo "<div class='jawaban'>";
+                                echo "<p><strong>" . htmlspecialchars($row2['fullname']) . ":</strong> " . htmlspecialchars($row2['jawaban']) . "</p>";
+                                
+                                // Tombol Like
                         echo "<button class='Btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
                         echo "  <span class='leftContainer'>";
                         echo "    <svg fill='white' viewBox='0 0 512 512' height='1em' xmlns='http://www.w3.org/2000/svg'><path d='M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z'></path></svg>";
@@ -368,30 +426,33 @@ if ($result) {
                         echo "  <span class='likeCount'>" . htmlspecialchars($row2['likes']) . "</span>";
                         echo "</button>";
 
-                        // Tombol Lapor
-                        echo "<button class='report-btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
-                        echo "  <span>Lapor</span>";
-                        echo "</button>";
+                                // Tombol Lapor
+                                echo "<button class='report-btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
+                                echo "<span>Lapor</span>";
+                                echo "</button>";
 
-                        echo "</div>";
+                                echo "</div>";
+                            }
+                        } else {
+                            echo "<p>Belum ada jawaban.</p>";
+                        }
+                        $result2->close();
+                    } else {
+                        echo "<p>Terjadi kesalahan saat mengambil jawaban: " . $koneksi->error . "</p>";
                     }
+                    $stmt2->close();
+
+                    echo "</div>";
                 }
-                $result2->free();
+            } else {
+                echo "<p>Tidak ada pertanyaan yang ditemukan.</p>";
             }
-
-            echo "</div>";
-            echo "<hr>";
+            $result->close();
+        } else {
+            echo "<p>Terjadi kesalahan saat mengambil pertanyaan: " . $koneksi->error . "</p>";
         }
-    } else {
-        echo "Belum ada pertanyaan.";
-    }
-    $result->free();
-} else {
-    echo "Terjadi kesalahan saat mengambil data pertanyaan: " . $koneksi->error;
-}
-
-        $koneksi->close(); // Tutup koneksi ke database
+        $stmt->close();
         ?>
     </div>
 </body>
-</html>v
+</html>
