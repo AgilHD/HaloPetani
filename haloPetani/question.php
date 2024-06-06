@@ -1,49 +1,52 @@
 <?php
-session_start(); // Memindahkan session_start() ke baris pertama setelah tag pembuka PHP
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Your form processing code here
+session_start(); // Pindahkan session_start() ke baris pertama setelah tag pembuka PHP
+include 'config.php'; // Sertakan file koneksi ke database
 
-    // Redirect the user to the same page using HTTP GET after form submission
+// Memproses pengiriman pertanyaan
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pertanyaan'])) {
+    $fullname = $_POST['fullname'];
+    $pertanyaan = $_POST['pertanyaan'];
+
+    // Simpan pertanyaan ke dalam database
+    $query = "INSERT INTO pertanyaan (fullname, pertanyaan) VALUES (?, ?)";
+    $stmt = $koneksi->prepare($query);
+    if ($stmt === false) {
+        die("Error preparing statement: " . $koneksi->error);
+    }
+    $stmt->bind_param("ss", $fullname, $pertanyaan);
+    if ($stmt->execute()) {
+        echo "<p>Pertanyaan Anda telah berhasil dikirim.</p>";
+    } else {
+        echo "<p>Terjadi kesalahan saat menyimpan pertanyaan: " . $koneksi->error . "</p>";
+    }
+    $stmt->close();
+}
+
+// Memproses pengiriman jawaban
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_jawaban'])) {
+    $idpertanyaan = $_POST['idpertanyaan'];
+    $jawaban = $_POST['jawaban'];
+    $user_id = isset($_SESSION['user']['userid']) ? $_SESSION['user']['userid'] : 0; // Pastikan variabel ini ada
+
+    // Simpan jawaban ke dalam database
+    $query = "INSERT INTO jawaban (idpertanyaan, jawaban, user_id) VALUES (?, ?, ?)";
+    $stmt = $koneksi->prepare($query);
+    if ($stmt === false) {
+        die("Error preparing statement: " . $koneksi->error);
+    }
+    $stmt->bind_param("isi", $idpertanyaan, $jawaban, $user_id);
+    if ($stmt->execute()) {
+        echo "<p>Jawaban Anda telah berhasil dikirim.</p>";
+    } else {
+        echo "<p>Terjadi kesalahan saat menyimpan jawaban: " . $koneksi->error . "</p>";
+    }
+    $stmt->close();
+}
+
+// Redirect setelah memproses form untuk menghindari pengiriman ulang data
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: " . $_SERVER['REQUEST_URI']);
     exit();
-}
-
-// Memproses laporan pertanyaan
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_pertanyaan'])) {
-    $idpertanyaan = $_POST['idpertanyaan'];
-
-    // Update jumlah laporan dalam tabel pertanyaan
-    $query = "UPDATE halopetani_pertanyaan SET pertanyaandilaporkan = pertanyaandilaporkan + 1 WHERE idpertanyaan = ?";
-    $stmt = $koneksi->prepare($query);
-    if ($stmt === false) {
-        die("Error preparing statement: " . $koneksi->error);
-    }
-    $stmt->bind_param("i", $idpertanyaan);
-    if ($stmt->execute()) {
-        echo "Laporan pertanyaan telah berhasil ditambahkan.";
-    } else {
-        echo "Terjadi kesalahan saat menambahkan laporan pertanyaan: " . $koneksi->error;
-    }
-    $stmt->close();
-}
-
-// Memproses laporan jawaban
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
-    $idjawaban = $_POST['idjawaban'];
-
-    // Update jumlah laporan dalam tabel jawaban
-    $query = "UPDATE halopetani_jawaban SET jawabandilaporkan = jawabandilaporkan + 1 WHERE idjawaban = ?";
-    $stmt = $koneksi->prepare($query);
-    if ($stmt === false) {
-        die("Error preparing statement: " . $koneksi->error);
-    }
-    $stmt->bind_param("i", $idjawaban);
-    if ($stmt->execute()) {
-        echo "Laporan jawaban telah berhasil ditambahkan.";
-    } else {
-        echo "Terjadi kesalahan saat menambahkan laporan jawaban: " . $koneksi->error;
-    }
-    $stmt->close();
 }
 ?>
 
@@ -365,49 +368,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
         <h2>Pertanyaan-pertanyaan:</h2> 
         
         <?php
-        include 'config.php'; // Sertakan file koneksi ke database
-
-        // Memproses pengiriman pertanyaan dari formulir
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_pertanyaan'])) {
-            $fullname = $_POST['fullname'];
-            $pertanyaan = $_POST['pertanyaan'];
-
-            // Simpan pertanyaan ke dalam database
-            $query = "INSERT INTO pertanyaan (fullname, pertanyaan) VALUES (?, ?)";
-            $stmt = $koneksi->prepare($query);
-            if ($stmt === false) {
-                die("Error preparing statement: " . $koneksi->error);
-            }
-            $stmt->bind_param("ss", $fullname, $pertanyaan);
-            if ($stmt->execute()) {
-                echo "<p>Pertanyaan Anda telah berhasil dikirim.</p>";
-            } else {
-                echo "<p>Terjadi kesalahan saat menyimpan pertanyaan: " . $koneksi->error . "</p>";
-            }
-            $stmt->close();
-        }
-
-        // Memproses pengiriman jawaban dari formulir
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_jawaban'])) {
-            $idpertanyaan = $_POST['idpertanyaan'];
-            $jawaban = $_POST['jawaban'];
-            $user_id = isset($_SESSION['user']['userid']) ? $_SESSION['user']['userid'] : 0; // Pastikan variabel ini ada
-
-            // Simpan jawaban ke dalam database
-            $query = "INSERT INTO jawaban (idpertanyaan, jawaban, user_id) VALUES (?, ?, ?)";
-            $stmt = $koneksi->prepare($query);
-            if ($stmt === false) {
-                die("Error preparing statement: " . $koneksi->error);
-            }
-            $stmt->bind_param("isi", $idpertanyaan, $jawaban, $user_id);
-            if ($stmt->execute()) {
-                echo "<p>Jawaban Anda telah berhasil dikirim.</p>";
-            } else {
-                echo "<p>Terjadi kesalahan saat menyimpan jawaban: " . $koneksi->error . "</p>";
-            }
-            $stmt->close();
-        }
-
         // Ambil dan tampilkan pertanyaan dari database
         $search = isset($_GET['search']) ? "%" . $_GET['search'] . "%" : "%%";
         $query = "SELECT * FROM pertanyaan WHERE pertanyaan LIKE ? ORDER BY idpertanyaan DESC";
@@ -428,11 +388,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
                     echo "</button>";
 
                     // Formulir untuk mengajukan jawaban
-            echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='POST'>";
-            echo "<input type='hidden' name='idpertanyaan' value='" . htmlspecialchars($row['idpertanyaan']) . "'>";
-            echo "<textarea name='jawaban' rows='2' required></textarea>";
-            echo "<input type='submit' value='Kirim Jawaban' name='submit_jawaban'>";
-            echo "</form>";
+                    echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='POST'>";
+                    echo "<input type='hidden' name='idpertanyaan' value='" . htmlspecialchars($row['idpertanyaan']) . "'>";
+                    echo "<textarea name='jawaban' rows='2' required></textarea>";
+                    echo "<input type='submit' value='Kirim Jawaban' name='submit_jawaban'>";
+                    echo "</form>";
 
                     // Ambil dan tampilkan jawaban dari database
                     $query2 = "SELECT j.idjawaban, j.jawaban, p.fullname, j.likes FROM jawaban j JOIN pengguna p ON j.user_id = p.userid WHERE j.idpertanyaan = ? ORDER BY j.idjawaban DESC";
@@ -447,36 +407,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
                                 echo "<p><strong>" . htmlspecialchars($row2['fullname']) . ":</strong> " . htmlspecialchars($row2['jawaban']) . "</p>";
                                 
                                 // Tombol Like
-                        echo "<button class='Btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
-                        echo "  <span class='leftContainer'>";
-                        echo "    <svg fill='white' viewBox='0 0 512 512' height='1em' xmlns='http://www.w3.org/2000/svg'><path d='M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z'></path></svg>";
-                        echo "    <span class='like'>Like</span>";
-                        echo "  </span>";
-                        echo "  <span class='likeCount'>" . htmlspecialchars($row2['likes']) . "</span>";
-                        echo "</button>";
+                                echo "<button class='Btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
+                                echo "  <span class='leftContainer'>";
+                                echo "    <svg fill='white' viewBox='0 0 512 512' height='1em' xmlns='http://www.w3.org/2000/svg'><path d='M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z'></path></svg>";
+                                echo "    <span class='like'>Like</span>";
+                                echo "  </span>";
+                                echo "  <span class='likeCount'>" . htmlspecialchars($row2['likes']) . "</span>";
+                                echo "</button>";
 
                                 // Tombol Lapor
-                                echo "<button class='report-btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
+                                echo "<button class='Btn' data-idjawaban='" . htmlspecialchars($row2['idjawaban']) . "'>";
                                 echo "<span>Lapor</span>";
                                 echo "</button>";
 
                                 echo "</div>";
                             }
-                        } else {
-                            echo "<p>Belum ada jawaban.</p>";
                         }
-                        $result2->close();
-                    } else {
-                        echo "<p>Terjadi kesalahan saat mengambil jawaban: " . $koneksi->error . "</p>";
                     }
                     $stmt2->close();
-
                     echo "</div>";
                 }
             } else {
                 echo "<p>Tidak ada pertanyaan yang ditemukan.</p>";
             }
-            $result->close();
         } else {
             echo "<p>Terjadi kesalahan saat mengambil pertanyaan: " . $koneksi->error . "</p>";
         }
