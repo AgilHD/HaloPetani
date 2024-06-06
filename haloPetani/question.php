@@ -81,6 +81,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
         box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         animation: fadeIn 1s ease-in-out;
     }
+    .container2 {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 30px;
+        background-color: rgba(0, 0, 0, 0.9); /* Warna hitam dengan opasitas 0.9 */
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        animation: fadeIn 1s ease-in-out;
+    }
 
     @keyframes fadeIn {
         from { opacity: 0; }
@@ -262,6 +271,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
         transform: scale(1.15);
         transform-origin: top;
     }
+
+    .back-button {
+        position: absolute; 
+        top: 10px; 
+        left: 10px; 
+        background-color: #4CAF50; /* green */
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        }
+
+     .back-button:hover {
+        background-color: #3e8e41; /* darker green */
+        }
+
+    
 </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -313,6 +340,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
 <body>
     <div class="container">
         <h1>Forum Pertanyaan</h1>
+        <a href="menu.php" class="back-button">Kembali</a>
         <!-- Formulir pencarian pertanyaan -->
         <form method="GET">
             <input type="text" name="search" placeholder="Cari pertanyaan..." required>
@@ -331,7 +359,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['lapor_jawaban'])) {
         </form>
 
         <hr>
-
+</div>
+        <div class="container2">
         <!-- Daftar pertanyaan -->
         <h2>Pertanyaan-pertanyaan:</h2> 
         
