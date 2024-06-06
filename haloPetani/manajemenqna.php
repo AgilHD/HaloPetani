@@ -60,9 +60,27 @@
         button:hover {
             background-color: #45a049;
         }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: #ffffff;
+            text-decoration: none;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: #004d40;
+        }
     </style>
 </head>
 <body>
+    <div class="back-button">
+        <a href='adminpage.php'>Kembali Ke Menu</a>
+    </div>
     <div class="container">
         <h2>Pertanyaan Dilaporkan</h2>
         <table>
