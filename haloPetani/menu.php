@@ -84,6 +84,7 @@ include 'config.php';
     </header>
     <nav>
         <ul>
+            <li><a href="list-tanaman.php">Data jenis tanaman</a></li>
             <li><a href="question.php">Q&A</a></li>
             <li><a href="bacaartikel.php">Artikel Pertanaman</a></li>
             <li><a href="login-pengguna.php">LogOut</a></li>
