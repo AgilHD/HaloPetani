@@ -8,8 +8,11 @@ include 'config.php';
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #e0f7fa;
-            color: #37474f;
+            background-image: url('hutangelap.jpeg');
+            background-size: cover;
+            background-color: rgba(0, 0, 0, 0.7); /* Warna hitam dengan opasitas 0.7 */
+            background-blend-mode: overlay;
+            color: #fff; /* Warna teks putih */
             margin: 0;
             padding: 20px;
         }
@@ -17,10 +20,13 @@ include 'config.php';
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background-color: rgba(0, 0, 0, 0.9); /* Warna hitam dengan opasitas 0.9 */
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
         }
         h2 {
             text-align: center;
-            color: #00796b;
+            color: #ffcc00; /* Warna kuning */
             margin-bottom: 40px;
         }
         .header {
@@ -30,15 +36,18 @@ include 'config.php';
             margin-bottom: 20px;
         }
         .article-list-container {
-            background-color: #ffffff;
+            background-color: #333;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            flex-grow: 1;
+        }
+        .article-type {
+            cursor: pointer;
+            color: #ffcc00; /* Warna kuning */
+            font-weight: bold;
         }
         .article-list {
-            display: flex;
+            display: none; /* Hide articles by default */
             flex-wrap: wrap;
             list-style: none;
             padding: 0;
@@ -47,27 +56,26 @@ include 'config.php';
         }
         .article-list li {
             flex: 1 1 calc(33.333% - 20px);
-            background-color: #00796b;
+            background-color: #ffcc00;
             color: #ffffff;
             padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, background-color 0.2s;
         }
         .article-list li a {
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .article-list li:hover {
-            transform: translateY(-5px);
-            background-color: #004d40;
-        }
+          color: #000000; /* Warna hitam */
+          text-decoration: none;
+          font-weight: bold;
+          }
+
+        .article-list li a:hover {
+           color: #ffcc00; /* Warna kuning */
+         }
         .article-content {
-            background-color: #ffffff;
+            background-color: #333;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
             margin-top: 20px;
         }
         .rating {
@@ -76,40 +84,35 @@ include 'config.php';
         .rating label {
             margin-right: 10px;
             font-weight: bold;
-            color: #00796b;
+            color: #ffcc00; /* Warna kuning */
         }
-        .rating select {
-            padding: 5px 10px;
-            border-radius: 5px;
-            border: 1px solid #00796b;
+        .star-rating {
+            direction: rtl;
+            display: inline-flex;
+            font-size: 2em;
+            justify-content: center;
         }
-        .rating button {
-            padding: 5px 15px;
-            border: none;
-            border-radius: 5px;
-            background-color: #00796b;
-            color: #ffffff;
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            color: #ddd;
             cursor: pointer;
-            margin-left: 10px;
-            transition: background-color 0.2s;
         }
-        .rating button:hover {
-            background-color: #004d40;
+        .star-rating label:hover, .star-rating label:hover ~ label, .star-rating input[type="radio"]:checked ~ label {
+            color: #ffd700;
         }
         .back-button {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #00796b;
-            color: #ffffff;
+            background-color: #ffcc00; /* Warna kuning */
+            color: #333;
             text-decoration: none;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
+            border-radius: 5px;
             transition: background-color 0.2s;
         }
         .back-button:hover {
-            background-color: #004d40;
+            background-color: #cc9900; /* Warna kuning gelap */
         }
         @media (max-width: 768px) {
             .article-list li {
@@ -117,6 +120,18 @@ include 'config.php';
             }
         }
     </style>
+    <script>
+        function toggleArticles(type) {
+            var articles = document.querySelectorAll('.article-list[data-type="' + type + '"]');
+            articles.forEach(function(articleList) {
+                if (articleList.style.display === 'none' || articleList.style.display === '') {
+                    articleList.style.display = 'flex';
+                } else {
+                    articleList.style.display = 'none';
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -125,19 +140,37 @@ include 'config.php';
             <a href='menu.php' class='back-button'>Kembali Ke Menu</a>
         </div>
         <div class="article-list-container">
-            <ul class="article-list">
-                <?php
-                $query = "SELECT id, title FROM artikel";
-                $result = $koneksi->query($query);
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<li><a href='bacaartikel.php?id=" . $row['id'] . "'>" . $row['title'] . "</a></li>";
+            <?php
+            // Get distinct article types
+            $query = "SELECT DISTINCT articleType FROM artikel";
+            $result = $koneksi->query($query);
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $articleType = $row['articleType'];
+                    echo "<h3 class='article-type' onclick=\"toggleArticles('$articleType')\">" . $articleType . "</h3>";
+                    echo "<ul class='article-list' data-type='$articleType'>";
+                    
+                    // Get articles of this type
+                    $article_query = "SELECT id, title FROM artikel WHERE articleType = ?";
+                    $stmt = $koneksi->prepare($article_query);
+                    $stmt->bind_param("s", $articleType);
+                    $stmt->execute();
+                    $article_result = $stmt->get_result();
+                    
+                    if ($article_result->num_rows > 0) {
+                        while ($article_row = $article_result->fetch_assoc()) {
+                            echo "<li><a href='bacaartikel.php?id=" . $article_row['id'] . "'>" . $article_row['title'] . "</a></li>";
+                        }
+                    } else {
+                        echo "<li>Belum ada artikel dalam kategori ini.</li>";
                     }
-                } else {
-                    echo "<li>Belum ada artikel.</li>";
+                    echo "</ul>";
+                    $stmt->close();
                 }
-                ?>
-            </ul>
+            } else {
+                echo "Belum ada artikel.";
+            }
+            ?>
         </div>
         <div class="article-content">
             <?php
@@ -178,11 +211,12 @@ include 'config.php';
                     echo "<div class='rating'>";
                     echo "<form action='bacaartikel.php?id=" . $row['id'] . "' method='post'>";
                     echo "<label for='rating'>Beri Rating: </label>";
-                    echo "<select name='rating' id='rating'>";
-                    for ($i = 1; $i <= 5; $i++) {
-                        echo "<option value='$i'>$i</option>";
+                    echo "<div class='star-rating'>";
+                    for ($i = 5; $i >= 1; $i--) {
+                        echo "<input type='radio' id='star$i' name='rating' value='$i'>";
+                        echo "<label for='star$i'>&#9733;</label>";
                     }
-                    echo "</select>";
+                    echo "</div>";
                     echo "<button class='back-button' type='submit'>Kirim</button>";
                     echo "</form>";
                     echo "</div>";
