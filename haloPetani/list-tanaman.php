@@ -91,10 +91,32 @@
         .question-button a:hover {
             background-color: #357a38;
         }
+
+        .back-button {
+            display: block;
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .back-button a {
+            background-color: #3e8e41;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .back-button a:hover {
+            background-color: #357a38;
+        }
     </style>
 </head>
 <body>
     <h2>Form Jenis Tanaman</h2>
+    <div class="back-button">
+        <a href='menu.php'>Kembali Ke Menu</a>
+    </div>
     <div class="container">
         <form onsubmit="return searchPlant()">
             <label for="searchQuery">Cari Tanaman:</label>
@@ -200,7 +222,7 @@
                 questionButton.style.display = 'none';
             }
 
-            return false; // Prevent form submission
+            return false; 
         }
     </script>
 </body>
