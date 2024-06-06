@@ -74,12 +74,12 @@
         }
         .back-button:hover {
             background-color: #004d40;
-        }
+        }
     </style>
 </head>
 <body>
     <div class="back-button">
-        <a href='adminpage.php'>Kembali Ke Menu</a>
+        <a href='adminpage.php'>Kembali Ke Menu</a>
     </div>
     <div class="container">
         <h2>Pertanyaan Dilaporkan</h2>
@@ -135,6 +135,37 @@
             }
             ?>
         </table>
+
+        <h2>Jenis Tanaman</h2>
+        <table>
+            <tr>
+                <th>Nama Tanaman</th>
+                <th>Aksi</th>
+            </tr>
+            <?php
+            try {
+                $query_tanaman = "SELECT * FROM jenistanaman";
+                $result_tanaman = mysqli_query($koneksi, $query_tanaman);
+                $jenis_tanaman = mysqli_fetch_all($result_tanaman, MYSQLI_ASSOC);
+
+                foreach ($jenis_tanaman as $tanaman) {
+                    echo "<tr>";
+                    echo "<td>" . $tanaman['nama_jenistanaman'] . "</td>";
+                    echo "<td><button onclick='editTanaman(" . $tanaman['id_tanaman'] . ")'>Edit</button> <button onclick='deleteTanaman(" . $tanaman['id_tanaman'] . ")'>Delete</button></td>";
+                    echo "</tr>";
+                }
+            } catch(Exception $e) {
+                echo "Koneksi database gagal: " . $e->getMessage();
+            }
+            ?>
+        </table>
+
+        <form id="formTanaman" action="action.php?action=add_tanaman" method="POST" style="margin-top: 20px;">
+            <h2>Tambah Jenis Tanaman</h2>
+            <label for="nama_jenistanaman">Nama Tanaman:</label><br>
+            <input type="text" id="nama_jenistanaman" name="nama_jenistanaman"><br><br>
+            <button type="submit">Tambah</button>
+        </form>
     </div>
 
     <script>
@@ -159,6 +190,19 @@
         function resetJawaban(id) {
             if (confirm('Apakah Anda yakin ingin mereset jumlah dilaporkan jawaban ini?')) {
                 window.location.href = 'action.php?action=reset_jawaban&id=' + id;
+            }
+        }
+
+        function deleteTanaman(id) {
+            if (confirm('Apakah Anda yakin ingin menghapus jenis tanaman ini?')) {
+                window.location.href = 'action.php?action=delete_tanaman&id=' + id;
+            }
+        }
+
+        function editTanaman(id) {
+            var newName = prompt('Masukkan nama baru untuk jenis tanaman:');
+            if (newName !== null && newName.trim() !== '') {
+                window.location.href = 'action.php?action=edit_tanaman&id=' + id + '&nama=' + newName;
             }
         }
     </script>
