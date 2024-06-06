@@ -1,43 +1,69 @@
 <?php
 include 'config.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['newArticleType'])) {
-    $newArticleType = $_POST['newArticleType'];
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Handle adding new article type
+    if (isset($_POST['newArticleType'])) {
+        $newArticleType = $_POST['newArticleType'];
 
-    $query = "SELECT nama_jenisartikel FROM jenisartikel WHERE nama_jenisartikel=?";
-    $stmt = $koneksi->prepare($query);
-    $stmt->bind_param("s", $newArticleType);
-    $stmt->execute();
-    $stmt->store_result();
+        $query = "SELECT nama_jenisartikel FROM jenisartikel WHERE nama_jenisartikel=?";
+        $stmt = $koneksi->prepare($query);
+        $stmt->bind_param("s", $newArticleType);
+        $stmt->execute();
+        $stmt->store_result();
 
-    if ($stmt->num_rows === 0) {
-        $insertQuery = "INSERT INTO jenisartikel (nama_jenisartikel) VALUES (?)";
-        $insertStmt = $koneksi->prepare($insertQuery);
-        $insertStmt->bind_param("s", $newArticleType);
-        $insertStmt->execute();
-        $insertStmt->close();
-        echo "Jenis artikel berhasil ditambahkan.";
-    } else {
-        echo "Jenis artikel sudah ada dalam database.";
+        if ($stmt->num_rows === 0) {
+            $insertQuery = "INSERT INTO jenisartikel (nama_jenisartikel) VALUES (?)";
+            $insertStmt = $koneksi->prepare($insertQuery);
+            $insertStmt->bind_param("s", $newArticleType);
+            $insertStmt->execute();
+            $insertStmt->close();
+            echo "Jenis artikel berhasil ditambahkan.";
+        } else {
+            echo "Jenis artikel sudah ada dalam database.";
+        }
+
+        $stmt->close();
     }
 
-    $stmt->close();
+    // Handle adding new article
+    if (isset($_POST['articleTitle'])) {
+        $title = $_POST['articleTitle'];
+        $text = $_POST['articleText'];
+        $articleType = $_POST['articleType'];
+
+        $query = "INSERT INTO artikel (title, text, articleType) VALUES (?, ?, ?)";
+        $stmt = $koneksi->prepare($query);
+        if ($stmt === false) {
+            die("Error preparing statement: " . $koneksi->error);
+        }
+        $stmt->bind_param("sss", $title, $text, $articleType);
+        $stmt->execute();
+        $stmt->close();
+        echo "Artikel berhasil diunggah.";
+    }
+
+    // Handle deleting an article
+    if (isset($_POST['deleteArticleId'])) {
+        $articleId = $_POST['deleteArticleId'];
+
+        $deleteQuery = "DELETE FROM artikel WHERE id=?";
+        $deleteStmt = $koneksi->prepare($deleteQuery);
+        $deleteStmt->bind_param("i", $articleId);
+        $deleteStmt->execute();
+        $deleteStmt->close();
+        echo "Artikel berhasil dihapus.";
+    }
+
+    $koneksi->close();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['articleTitle'])) {
-    $title = $_POST['articleTitle'];
-    $text = $_POST['articleText'];
-    $articleType = $_POST['articleType'];
-
-    $query = "INSERT INTO artikel (title, text, articleType) VALUES (?, ?, ?)";
-    $stmt = $koneksi->prepare($query);
-    if ($stmt === false) {
-        die("Error preparing statement: " . $koneksi->error);
+function truncateText($text, $maxWords) {
+    $words = explode(' ', $text);
+    if (count($words) > $maxWords) {
+        return implode(' ', array_slice($words, 0, $maxWords)) . '...';
     }
-    $stmt->bind_param("sss", $title, $text, $articleType);
-    $stmt->execute();
-    $stmt->close();
-    $koneksi->close();
+    return $text;
 }
 ?>
 
@@ -107,9 +133,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['articleTitle'])) {
             max-width: 800px;
             height: auto;
         }
+        table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: #ffffff;
+            text-decoration: none;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: #004d40;
+        }
     </style>
 </head>
 <body>
+    <div class="back-button">
+        <a href='adminpage.php'>Kembali Ke Menu</a>
+    </div>
     <h2 style="color: white;">Form Artikel</h2>
     <form action="" method="POST" class="form-container">
         <label for="articleTitle">Judul Artikel:</label><br>
@@ -140,6 +200,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['articleTitle'])) {
         <input type="text" id="newArticleType" name="newArticleType" required><br>
         <input type="submit" value="Tambah Jenis Artikel">
     </form>
+    
+    <h2 style="color: white;">Daftar Artikel</h2>
+    <div class="form-container">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Judul</th>
+                <th>Isi</th>
+                <th>Jenis</th>
+                <th>Aksi</th>
+            </tr>
+            <?php
+            include 'config.php';
+            $query = "SELECT * FROM artikel";
+            $result = $koneksi->query($query);
+            if ($result && $result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . $row['id'] . "</td>";
+                    echo "<td>" . $row['title'] . "</td>";
+                    echo "<td>" . truncateText($row['text'], 100) . "</td>";
+                    echo "<td>" . $row['articleType'] . "</td>";
+                    echo "<td>
+                        <form action='' method='POST' style='display:inline;'>
+                            <input type='hidden' name='deleteArticleId' value='" . $row['id'] . "'>
+                            <input type='submit' value='Hapus'>
+                        </form>
+                    </td>";
+                    echo "</tr>";
+                }
+            } else {
+                echo "<tr><td colspan='5'>Tidak ada artikel tersedia</td></tr>";
+            }
+            $koneksi->close();
+            ?>
+        </table>
+    </div>
 </body>
 </html>
-
