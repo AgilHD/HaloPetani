@@ -23,12 +23,19 @@ include 'config.php';
             color: #00796b;
             margin-bottom: 40px;
         }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
         .article-list-container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            flex-grow: 1;
         }
         .article-list {
             display: flex;
@@ -89,6 +96,21 @@ include 'config.php';
         .rating button:hover {
             background-color: #004d40;
         }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #00796b;
+            color: #ffffff;
+            text-decoration: none;
+            border-top-left-radius: 3px;
+            border-top-right-radius: 3px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            transition: background-color 0.2s;
+        }
+        .back-button:hover {
+            background-color: #004d40;
+        }
         @media (max-width: 768px) {
             .article-list li {
                 flex: 1 1 100%;
@@ -98,7 +120,10 @@ include 'config.php';
 </head>
 <body>
     <div class="container">
-        <h2>Daftar Artikel</h2>
+        <div class="header">
+            <h2>Daftar Artikel</h2>
+            <a href='menu.php' class='back-button'>Kembali Ke Menu</a>
+        </div>
         <div class="article-list-container">
             <ul class="article-list">
                 <?php
@@ -158,9 +183,10 @@ include 'config.php';
                         echo "<option value='$i'>$i</option>";
                     }
                     echo "</select>";
-                    echo "<button type='submit'>Kirim</button>";
+                    echo "<button class='back-button' type='submit'>Kirim</button>";
                     echo "</form>";
                     echo "</div>";
+                
                 } else {
                     echo "Artikel tidak ditemukan.";
                 }
